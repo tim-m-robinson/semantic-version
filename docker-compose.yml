@@ -1,0 +1,23 @@
+version:  '2'
+
+services:
+  jenkins:
+    image: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+
+  nexus:
+    image: sonatype/nexus3
+    ports:
+      - "8081:8081"
+      - "2395:2395"
+      - "2385:2385"
+    volumes:
+      - nexus-data:/nexus-data
+
+volumes:
+  jenkins_data:
+  nexus-data:
