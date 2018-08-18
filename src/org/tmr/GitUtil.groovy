@@ -126,6 +126,9 @@ class GitUtil implements Serializable {
     def tagNew, commitList
     def tagCount = getTagsCount()
 
+    // Define git identity
+    reset()
+
     if( tagCount == '0' ) {
       commitList = getAllCommitComments()
       tagNew = 'v1.0.0'
