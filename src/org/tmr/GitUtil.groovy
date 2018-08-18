@@ -155,8 +155,8 @@ class GitUtil implements Serializable {
     // of commit comments
     script.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitCredentialId,
                              usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-        sh('git tag -a "'+tagNew+'" -m "'+commitList+'"')
-        sh('git push --tags https://${USERNAME}:${PASSWORD}@'+repository)
+        script.sh('git tag -a "'+tagNew+'" -m "'+commitList+'"')
+        script.sh('git push --tags https://${USERNAME}:${PASSWORD}@'+repository)
     }
   }
 }
