@@ -99,14 +99,14 @@ class GitUtil implements Serializable {
     }
   }
 
-  def createGitHubRelease(String repository, String tag, String gitCredentialId) {
+  def createGitHubRelease(String repository, String tag) {
     // Remove the github url
-    def reponame = repository.substring(30)
+    def reponame = repository.substring(30);
     if (".git".equals(reponame[-4..-1])) {
       // Remove the .git suffix
       reponame = reponame[0..-5]
     }
-    script.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitCredentialId,
+    script.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'hts-builduser-github',
                              usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
       def command = "curl --user ${script.env.USERNAME}:${script.env.PASSWORD} --request POST \
               https://api.github.com/repos/atosorigin/${reponame}/releases --data\
@@ -120,5 +120,46 @@ class GitUtil implements Serializable {
       script.sh command
     }
 
+  }
+
+  def calcNewTagVersionAndPush (String repository, String gitCredentialId) {
+    def tagNew, commitList
+    def tagCount = getTagsCount()
+
+    if( tagCount == '0' ) {
+      commitList = getAllCommitComments()
+      tagNew = 'v1.0.0'
+    } else {
+      // get latest tag
+      def tagLatest = getLatestTagname()
+      commitList = getCommitCommentsSinceTag(tagLatest)
+
+      if ( commitList.equals('') ) {
+        //currentBuild.result = 'ABORTED'
+        //error('No changes commited since last tag')
+        echo 'No changes...'
+        return
+      }
+
+      // Here we calculate the next semantic version
+      def currentVersion = SemanticVersion.parse(tagLatest)
+      if(currentVersion.isReleaseCandidate()) {
+        tagNew = currentVersion.incrementRc().toString()
+      } else {
+        tagNew = currentVersion.incrementRevision().toString()
+      }
+
+      echo tagNew
+    }
+
+    echo commitList
+
+    // Create and Push new Tag with list
+    // of commit comments
+    script.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitCredentialId,
+                             usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+        sh('git tag -a "'+tagNew+'" -m "'+commitList+'"')
+        sh('git push --tags https://${USERNAME}:${PASSWORD}@'+repository)
+    }
   }
 }
