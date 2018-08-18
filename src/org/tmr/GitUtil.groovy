@@ -140,7 +140,7 @@ class GitUtil implements Serializable {
       if ( commitList.equals('') ) {
         //currentBuild.result = 'ABORTED'
         //error('No changes commited since last tag')
-        script.sh echo 'No changes commited since last tag.'
+        script.echo 'No changes commited since last tag.'
         return
       }
 
