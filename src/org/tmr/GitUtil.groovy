@@ -161,5 +161,7 @@ class GitUtil implements Serializable {
         script.sh('git tag -a "'+tagNew+'" -m "'+commitList+'"')
         script.sh('git push --tags https://${USERNAME}:${PASSWORD}@'+repository)
     }
+
+    return tagNew
   }
 }
