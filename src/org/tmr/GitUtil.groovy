@@ -149,10 +149,7 @@ class GitUtil implements Serializable {
         tagNew = currentVersion.incrementRevision().toString()
       }
 
-      echo tagNew
     }
-
-    echo commitList
 
     // Create and Push new Tag with list
     // of commit comments
